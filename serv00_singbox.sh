@@ -102,7 +102,7 @@ install_singbox() {
             generate_config   # 生成配置文件
             download_singbox  # 下载 SingBox 并启动
             set_links         # 写入相关链接和信息
-	        install_socks5    # 安装socks5
+	    install_socks5    # 安装socks5
             ;;
         [Nn]) 
             exit 0 

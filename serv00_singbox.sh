@@ -121,7 +121,7 @@ uninstall_singbox() {
 	      ps aux | grep $(whoami) | grep -v "sshd\|bash\|grep" | awk '{print $2}' | xargs -r kill -9 2>/dev/null
        	      rm -rfv $WORKDIR
 	      clear
-       	      green “四合一已完全卸载”
+       	      green “singbox已完全卸载”
           ;;
         [Nn]) exit 0 ;;
     	  *) red "无效的选择，请输入y或n" && menu ;;

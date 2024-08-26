@@ -142,7 +142,6 @@ reading "\n清理所有进程，确定继续清理吗？【y/n】: " choice
   esac
 }
 
-
 # Generating Configuration Files
 generate_config() {
 

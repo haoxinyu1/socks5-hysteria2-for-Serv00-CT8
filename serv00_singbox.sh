@@ -541,7 +541,7 @@ install_socks5(){
       if pgrep -x "s5" > /dev/null; then
         echo -e "\e[1;32mSocks5 代理程序启动成功\e[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$HOST_IP:$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS\033[0m"
-        echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32msocks://$(echo "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)=@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP\033[0m"
+        echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32msocks://$(echo "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP\033[0m"
         
         # 更新或创建 list.txt 文件
         cat >> "$FILE_PATH/list.txt" <<EOF

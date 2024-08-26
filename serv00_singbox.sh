@@ -546,7 +546,7 @@ install_socks5(){
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32msocks5://$SOCKS5_USER:$SOCKS5_PASS@$HOST_IP:$SOCKS5_PORT\033[0m"
         
         # 更新或创建 list.txt 文件
-        cat >> "list.txt" <<EOF
+        cat >> "$FILE_PATH/list.txt" <<EOF
 
 socks5节点信息
 

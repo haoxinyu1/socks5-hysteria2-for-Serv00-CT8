@@ -15,16 +15,17 @@ reading() { read -p "$(red "$1")" "$2"; }
 USERNAME=$(whoami)
 # 获取当前主机名
 HOSTNAME=$(hostname)
+USER_HOME=$(readlink -f /home/$USERNAME) # 获取标准化的用户主目录
 # 停止程序线程
 # ps aux | grep $(whoami) | grep -v "sshd\|bash\|grep" | awk '{print $2}' | xargs -r kill -9 2>/dev/null
 
 # 设置工作目录和文件路径
 if [[ "$HOSTNAME" == "s1.ct8.pl" ]]; then
-    USER_PATH="/home/$USERNAME/domains/${USERNAME}.ct8.pl"
+    USER_PATH="/$USER_HOME/domains/${USERNAME}.ct8.pl"
     WORKDIR="/home/$USERNAME/domains/${USERNAME}.ct8.pl/singbox"
     FILE_PATH="/home/$USERNAME/domains/${USERNAME}.ct8.pl/socks5"
 else
-    USER_PATH="/home/$USERNAME/domains/${USERNAME}.serv00.net"
+    USER_PATH="/$USER_HOME/domains/${USERNAME}.serv00.net"
     WORKDIR="/home/$USERNAME/domains/${USERNAME}.serv00.net/singbox"
     FILE_PATH="/home/$USERNAME/domains/${USERNAME}.serv00.net/socks5"
 fi
@@ -611,7 +612,7 @@ add_crontab_task() {
   crontab -l > /tmp/crontab.bak 2>/dev/null
   
   # 添加每12分钟运行一次 start_app.sh 脚本的任务
-  echo "*/12 * * * * $USER_PATH/start_app.sh >/dev/null 2>&1" >> /tmp/crontab.bak
+  echo "*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1" >> /tmp/crontab.bak
   
   # 重新加载 crontab 任务
   crontab /tmp/crontab.bak

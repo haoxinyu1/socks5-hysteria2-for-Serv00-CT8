@@ -430,7 +430,6 @@ EOF
   cat list.txt
   purple "\n$WORKDIR/list.txt saved successfully"
   purple "Running done!"
-  add_crontab_task
   sleep 2
   # rm -rf boot.log config.json sb.log core tunnel.yml tunnel.json fake_useragent_0.2.0.json
 }
@@ -538,7 +537,7 @@ install_socks5(){
 
       # 检查 socks5 程序是否成功启动
       if pgrep -x "s5" > /dev/null; then
-	    add_crontab_task
+	add_crontab_task
         echo -e "\e[1;32mSocks5 代理程序启动成功\e[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$HOST_IP:$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS\033[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32msocks5://$SOCKS5_USER:$SOCKS5_PASS@$HOST_IP:$SOCKS5_PORT\033[0m"
@@ -557,7 +556,7 @@ EOF
       fi
       ;;
     [Nn])
-      exit 0 
+      add_crontab_task
       ;;
     *) 
       echo -e "\e[1;31m无效的选择，请输入y或n\033[0m"

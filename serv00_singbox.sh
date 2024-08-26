@@ -424,9 +424,9 @@ set_links(){
   sleep 1
   yellow "注意：v2ray或其他软件的跳过证书验证需设置为true,否则hy2或tuic节点可能不通\n"
   cat >> list.txt <<EOF
-vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$USERNAME$ISP
+vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$USERNAME-$ISP
 
-hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME$ISP
+hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME-$ISP
 
 EOF
   cat list.txt
@@ -541,7 +541,7 @@ install_socks5(){
       if pgrep -x "s5" > /dev/null; then
         echo -e "\e[1;32mSocks5 代理程序启动成功\e[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$HOST_IP:$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS\033[0m"
-        echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32msocks5://$SOCKS5_USER:$SOCKS5_PASS=@$HOST_IP:$SOCKS5_PORT#$USERNAME$ISP\033[0m"
+        echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32msocks5://$SOCKS5_USER:$SOCKS5_PASS=@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP\033[0m"
         
         # 更新或创建 list.txt 文件
         cat >> "$FILE_PATH/list.txt" <<EOF

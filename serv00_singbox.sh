@@ -26,7 +26,7 @@ if [[ "$HOSTNAME" == "s1.ct8.pl" ]]; then
     WORKDIR="/home/$USERNAME/domains/${USERNAME}.ct8.pl/singbox"
     FILE_PATH="/home/$USERNAME/domains/${USERNAME}.ct8.pl/socks5"
 else
-    USER_PATH="/$USER_HOME/domains/${USERNAME}.serv00.net"
+    USER_PATH="$USER_HOME/domains/${USERNAME}.serv00.net"
     WORKDIR="/home/$USERNAME/domains/${USERNAME}.serv00.net/singbox"
     FILE_PATH="/home/$USERNAME/domains/${USERNAME}.serv00.net/socks5"
 fi

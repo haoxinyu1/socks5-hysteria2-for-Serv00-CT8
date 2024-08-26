@@ -15,7 +15,8 @@ reading() { read -p "$(red "$1")" "$2"; }
 USERNAME=$(whoami)
 # 获取当前主机名
 HOSTNAME=$(hostname)
-USER_HOME=$(readlink -f /home/$USERNAME) # 获取标准化的用户主目录
+# 获取标准化的用户主目录
+USER_HOME=$(readlink -f /home/$USERNAME)
 # 停止程序线程
 # ps aux | grep $(whoami) | grep -v "sshd\|bash\|grep" | awk '{print $2}' | xargs -r kill -9 2>/dev/null
 # 设置工作目录和文件路径

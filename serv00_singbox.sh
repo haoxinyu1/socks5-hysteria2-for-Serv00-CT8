@@ -648,11 +648,9 @@ menu() {
    echo  "==============="
    red "6. 运行socks5"
    echo  "==============="
-   yellow "7. 清理所有进程并推出SSH"
+   green "7. 查看节点信息"
    echo  "==============="
    yellow "8. 清理所有进程"
-   echo  "==============="
-   green "9. 查看节点信息"
    echo  "==============="
    red "0. 退出脚本"
    echo "==========="
@@ -665,9 +663,8 @@ menu() {
 		4) install_socks5 ;;
 		5) uninstall_socks5 ;;
 		6) run_socks5 ;;
-		7) kill_all_tasks ;;
+		7) get_links ;;
 		8) kill_tasks ;;
-		9) get_links ;;
         0) exit 0 ;;
         *) red "无效的选项，请输入 0 到 8" ;;
     esac

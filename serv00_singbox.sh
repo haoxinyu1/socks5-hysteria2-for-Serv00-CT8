@@ -631,10 +631,7 @@ add_crontab_task() {
 menu() {
    clear
    echo ""
-   purple "=== Serv00|ct8老王sing-box一键四合一安装脚本 ===\n"
-   echo -e "${green}脚本地址：${re}${yellow}https://github.com/eooce/Sing-box${re}\n"
-   echo -e "${green}反馈论坛：${re}${yellow}https://bbs.vps8.me${re}\n"
-   echo -e "${green}TG反馈群组：${re}${yellow}https://t.me/vps888${re}\n"
+   purple "=== Serv00|ct8 sing-box socks5安装脚本 ===\n"
    purple "转载请著名出处，请勿滥用\n"
    green "1. 安装sing-box"
    echo  "==============="
@@ -660,11 +657,11 @@ menu() {
         1) install_singbox ;;
         2) uninstall_singbox ;; 
         3) run_sing_box ;; 
-		4) install_socks5 ;;
-		5) uninstall_socks5 ;;
-		6) run_socks5 ;;
-		7) get_links ;;
-		8) kill_tasks ;;
+	4) install_socks5 ;;
+	5) uninstall_socks5 ;;
+	6) run_socks5 ;;
+	7) get_links ;;
+	8) kill_tasks ;;
         0) exit 0 ;;
         *) red "无效的选项，请输入 0 到 8" ;;
     esac

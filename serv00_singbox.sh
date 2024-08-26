@@ -630,9 +630,7 @@ add_crontab_task() {
 
 menu() {
    clear
-   echo ""
    purple "=== Serv00|ct8 sing-box socks5安装脚本 ===\n"
-   purple "转载请著名出处，请勿滥用\n"
    green "1. 安装sing-box"
    echo  "==============="
    red "2. 卸载sing-box"

@@ -579,8 +579,10 @@ install_socks5(){
       fi
 
       # 设置执行权限并启动 socks5 程序
-      chmod +x "${FILE_PATH}/s5"
-      nohup "${FILE_PATH}/s5" -c "${FILE_PATH}/config.json" >/dev/null 2>&1 &
+      cd
+      cd "$FILE_PATH" || { red "无法切换到工作目录 $FILE_PATH，退出安装。"; exit 1; }  # 确保目录切换成功
+      chmod +x s5
+      nohup ./s5 -c config.json >/dev/null 2>&1 &
       sleep 1
 
       # 获取主机 IP

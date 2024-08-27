@@ -441,6 +441,7 @@ set_links(){
 vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$USERNAME-$ISP
 
 hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME-$ISP
+
 EOF
   cat list.txt
   purple "\n$WORKDIR/list.txt saved successfully"
@@ -610,7 +611,6 @@ run_socks5() {
   nohup ./s5 -c config.json >/dev/null 2>&1 &
 }
 
-# 添加 crontab 守护进程任务
 add_crontab_task() {
   # 进入 USER_PATH 目录
   cd "$USER_PATH" || { echo "无法进入目录 $USER_PATH"; exit 1; }
@@ -627,23 +627,31 @@ add_crontab_task() {
   # 备份现有的 crontab 任务到临时文件
   crontab -l > /tmp/crontab.bak 2>/dev/null
   
-  # 添加每12分钟运行一次 start_app.sh 脚本的任务
-  echo "*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1" >> /tmp/crontab.bak
-  
-  # 重新加载 crontab 任务
-  crontab /tmp/crontab.bak
+  # 定义要添加的任务
+  new_task="*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1"
+
+  # 检查是否存在相同的任务
+  if grep -Fxq "$new_task" /tmp/crontab.bak; then
+    echo "相同的 crontab 任务已经存在，跳过添加"
+  else
+    # 如果存在类似的任务，先删除它，然后添加新任务
+    grep -v "start_app.sh" /tmp/crontab.bak > /tmp/crontab.new
+    echo "$new_task" >> /tmp/crontab.new
+    
+    # 重新加载 crontab 任务
+    crontab /tmp/crontab.new
+    rm /tmp/crontab.new
+
+    echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
+  fi
   
   # 删除临时 crontab 文件
   rm /tmp/crontab.bak
-  
-  # 输出任务添加完成的信息
-  echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
   
   # 等待2秒后执行 start_app.sh 脚本
   sleep 2
   ./start_app.sh
 }
-
 
 menu() {
    clear

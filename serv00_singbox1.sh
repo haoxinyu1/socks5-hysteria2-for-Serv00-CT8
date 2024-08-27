@@ -477,9 +477,9 @@ set_links(){
   cat >> list.txt <<EOF
 vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$MASKED_USERNAME-$ISP-$NAME-VL
 
-hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME-$ISP-$NAME
+hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$MASKED_USERNAME-$ISP-$NAME-HY
 
-tuic://$UUID:admin123@$IP:$tuic_port?sni=www.bing.com&congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#$MASKED_USERNAME-$ISP-$NAME-HY2
+tuic://$UUID:admin123@$IP:$tuic_port?sni=www.bing.com&congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#$MASKED_USERNAME-$ISP-$NAME-TU
 EOF
   cat list.txt
   purple "\n$WORKDIR/list.txt saved successfully"

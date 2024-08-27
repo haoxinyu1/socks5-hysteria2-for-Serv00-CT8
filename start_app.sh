@@ -77,14 +77,14 @@ force_restart_frps() {
 }
 
 # 检查并启动 frps 进程
-if [ -d "$FRP_PATH" ]; then
+if [ -d "$FRP_PATH" ] && [ -f "$FRP_PATH/frps" ]; then
     restart_frps
 else
-    echo "frps 目录不存在，跳过 frps 操作"
+    echo "frps 目录或程序文件不存在，跳过 frps 操作"
 fi
 
 # 检查并启动 s5 进程
-if [ -d "$S5_PATH" ]; then
+if [ -d "$S5_PATH" ] && [ -f "$S5_PATH/s5" ]; then
     if is_s5_running; then
         echo "s5 进程正在运行"
     else
@@ -92,11 +92,12 @@ if [ -d "$S5_PATH" ]; then
         start_process "$S5_PATH" "$S5_EXEC" is_s5_running "s5"
     fi
 else
-    echo "s5 目录不存在，跳过 s5 操作"
+    echo "s5 目录或程序文件不存在，跳过 s5 操作"
 fi
 
+
 # 检查并启动 web 进程
-if [ -d "$WEB_PATH" ]; then
+if [ -d "$WEB_PATH" ] && [ -f "$WEB_PATH/web" ]; then
     if is_web_running; then
         echo "web 进程正在运行"
     else
@@ -104,7 +105,7 @@ if [ -d "$WEB_PATH" ]; then
         start_process "$WEB_PATH" "$WEB_EXEC" is_web_running "web"
     fi
 else
-    echo "web 目录不存在，跳过 web 操作"
+    echo "web 目录或程序文件不存在，跳过 web 操作"
 fi
 
 # 可以调用 force_restart_frps 强制重启 frps

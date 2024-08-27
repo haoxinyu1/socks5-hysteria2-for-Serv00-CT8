@@ -559,7 +559,7 @@ socks5_config(){
 EOF
 }
 
-install_socks5(){
+install_socks5() {
   # 读取用户选择
   read -p "是否安装SOCKS5？【y/n】: " choice
   case "$choice" in
@@ -567,6 +567,7 @@ install_socks5(){
       # 进行 socks5 配置
       socks5_config
       ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26"-"$18}' | sed -e 's/ /_/g') 
+      
       # 下载或更新 socks5 程序
       if [[ ! -e "${FILE_PATH}/s5" ]]; then
         curl -L -sS -o "${FILE_PATH}/s5" "https://github.com/eooce/test/releases/download/freebsd/web"
@@ -579,8 +580,7 @@ install_socks5(){
       fi
 
       # 设置执行权限并启动 socks5 程序
-      cd
-      cd "$FILE_PATH" || { red "无法切换到工作目录 $FILE_PATH，退出安装。"; exit 1; }  # 确保目录切换成功
+      cd "$FILE_PATH" || { echo -e "\e[1;31m无法切换到工作目录 $FILE_PATH，退出安装。\033[0m"; exit 1; }
       chmod +x s5
       nohup ./s5 -c config.json >/dev/null 2>&1 &
       sleep 1
@@ -603,13 +603,37 @@ install_socks5(){
 $Socks5
 
 EOF
-        add_crontab_task
+
+        # 询问用户是否要添加 crontab 任务
+        read -p "是否添加 crontab 定时任务？【y/n】: " add_crontab
+        case "$add_crontab" in
+          [Yy])
+            add_crontab_task
+            ;;
+          [Nn])
+            echo -e "\e[1;32m已跳过 crontab 定时任务添加。\033[0m"
+            ;;
+          *)
+            echo -e "\e[1;31m无效的选择，跳过 crontab 定时任务添加。\033[0m"
+            ;;
+        esac
       else
         echo -e "\e[1;31mSocks5 代理程序启动失败\033[0m"
       fi
       ;;
     [Nn])
-      add_crontab_task
+      read -p "是否添加 crontab 定时任务？【y/n】: " add_crontab
+      case "$add_crontab" in
+        [Yy])
+          add_crontab_task
+          ;;
+        [Nn])
+          echo -e "\e[1;32m已跳过 crontab 定时任务添加。\033[0m"
+          ;;
+        *)
+          echo -e "\e[1;31m无效的选择，跳过 crontab 定时任务添加。\033[0m"
+          ;;
+      esac
       ;;
     *) 
       echo -e "\e[1;31m无效的选择，请输入y或n\033[0m"
@@ -661,23 +685,31 @@ add_crontab_task() {
   # 备份现有的 crontab 任务到临时文件
   crontab -l > /tmp/crontab.bak 2>/dev/null
   
-  # 添加每12分钟运行一次 start_app.sh 脚本的任务
-  echo "*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1" >> /tmp/crontab.bak
-  
-  # 重新加载 crontab 任务
-  crontab /tmp/crontab.bak
+  # 定义要添加的任务
+  new_task="*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1"
+
+  # 检查是否存在相同的任务
+  if grep -Fxq "$new_task" /tmp/crontab.bak; then
+    echo "相同的 crontab 任务已经存在，跳过添加"
+  else
+    # 如果存在类似的任务，先删除它，然后添加新任务
+    grep -v "start_app.sh" /tmp/crontab.bak > /tmp/crontab.new
+    echo "$new_task" >> /tmp/crontab.new
+    
+    # 重新加载 crontab 任务
+    crontab /tmp/crontab.new
+    rm /tmp/crontab.new
+
+    echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
+  fi
   
   # 删除临时 crontab 文件
   rm /tmp/crontab.bak
-  
-  # 输出任务添加完成的信息
-  echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
   
   # 等待2秒后执行 start_app.sh 脚本
   sleep 2
   ./start_app.sh
 }
-
 
 menu() {
    clear

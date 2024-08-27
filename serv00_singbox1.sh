@@ -12,6 +12,10 @@ purple() { echo -e "\e[1;35m$1\033[0m"; }
 reading() { read -p "$(red "$1")" "$2"; }
 # 获取当前用户名
 USERNAME=$(whoami)
+# 获取用户名的长度
+len=${#USERNAME}
+# 保留第一个字符和最后一个字符，其他部分用*号替换
+MASKED_USERNAME="${USERNAME:0:1}$(printf '*%.0s' $(seq 2 $((len-1))))${USERNAME: -1}"
 # 获取当前主机名
 HOSTNAME=$(hostname)
 NAME=$(echo "$HOSTNAME" | cut -d'.' -f1)
@@ -471,11 +475,11 @@ set_links(){
   sleep 1
   yellow "注意：v2ray或其他软件的跳过证书验证需设置为true,否则hy2或tuic节点可能不通\n"
   cat >> list.txt <<EOF
-vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$ISP-$NAME-VL
+vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$MASKED_USERNAME-$ISP-$NAME-VL
 
 hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME-$ISP-$NAME
 
-tuic://$UUID:admin123@$IP:$tuic_port?sni=www.bing.com&congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#$ISP-$NAME-HY2
+tuic://$UUID:admin123@$IP:$tuic_port?sni=www.bing.com&congestion_control=bbr&udp_relay_mode=native&alpn=h3&allow_insecure=1#$MASKED_USERNAME-$ISP-$NAME-HY2
 EOF
   cat list.txt
   purple "\n$WORKDIR/list.txt saved successfully"
@@ -591,7 +595,7 @@ install_socks5() {
 
       # 检查 socks5 程序是否成功启动
       if pgrep -x "s5" > /dev/null; then
-        Socks5="socks://$(echo -n "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$ISP-$NAME-S5"
+        Socks5="socks://$(echo -n "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$MASKED_USERNAME-$ISP-$NAME-S5"
         echo -e "\e[1;32mSocks5 代理程序启动成功\e[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$HOST_IP:$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS\033[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$Socks5\033[0m"

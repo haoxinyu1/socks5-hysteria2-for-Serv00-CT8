@@ -23,7 +23,6 @@ NAME=$(echo "$HOSTNAME" | cut -d'.' -f1)
 USER_HOME=$(readlink -f /home/$USERNAME)
 # 停止程序线程
 # ps aux | grep $(whoami) | grep -v "sshd\|bash\|grep" | awk '{print $2}' | xargs -r kill -9 2>/dev/null
-
 # 设置工作目录和文件路径
 if [[ "$HOSTNAME" == "s1.ct8.pl" ]]; then
     USER_PATH="$USER_HOME/domains/${USERNAME}.ct8.pl"

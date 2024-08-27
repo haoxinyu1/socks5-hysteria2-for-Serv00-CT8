@@ -557,7 +557,7 @@ install_socks5(){
 
       # 检查 socks5 程序是否成功启动
       if pgrep -x "s5" > /dev/null; then
-        Socks5="socks://$(echo "$SOCKS5_USER:$SOCKS5_PASS"|base64 -w0)@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP"
+        Socks5="socks://$(echo -n "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP"
         echo -e "\e[1;32mSocks5 代理程序启动成功\e[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$HOST_IP:$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS\033[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$Socks5\033[0m"

@@ -696,9 +696,11 @@ menu() {
    echo  "==============="
    yellow "8. 清理所有进程"
    echo  "==============="
+   re "9. 添加定时任务脚本"
+   echo  "==============="
    red "0. 退出脚本"
    echo "==========="
-   reading "请输入选择(0-8): " choice
+   reading "请输入选择(0-9): " choice
    echo ""
     case "${choice}" in
         1) install_singbox ;;
@@ -709,8 +711,9 @@ menu() {
 	6) run_socks5 ;;
 	7) get_links ;;
 	8) kill_tasks ;;
+        9) add_crontab_task ;;
         0) exit 0 ;;
-        *) red "无效的选项，请输入 0 到 8" ;;
+        *) red "无效的选项，请输入 0 到 9" ;;
     esac
 }
 menu

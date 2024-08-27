@@ -33,7 +33,6 @@ else
     WORKDIR="/home/$USERNAME/domains/${USERNAME}.serv00.net/singbox"
     FILE_PATH="/home/$USERNAME/domains/${USERNAME}.serv00.net/socks5"
 fi
-
 mkdir -p "$WORKDIR" && chmod 777 "$WORKDIR"
 mkdir -p "$FILE_PATH" && chmod 777 "$FILE_PATH"
 

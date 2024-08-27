@@ -10,7 +10,6 @@ green() { echo -e "\e[1;32m$1\033[0m"; }
 yellow() { echo -e "\e[1;33m$1\033[0m"; }
 purple() { echo -e "\e[1;35m$1\033[0m"; }
 reading() { read -p "$(red "$1")" "$2"; }
-
 # 获取当前用户名
 USERNAME=$(whoami)
 # 获取当前主机名

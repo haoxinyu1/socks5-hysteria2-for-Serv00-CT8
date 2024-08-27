@@ -442,7 +442,6 @@ set_links(){
 vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$USERNAME-$ISP
 
 hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME-$ISP
-
 EOF
   cat list.txt
   purple "\n$WORKDIR/list.txt saved successfully"
@@ -454,7 +453,7 @@ EOF
 get_links() {
   # 输出 $FILE_PATH/list.txt 的内容
   if [ -e "$FILE_PATH/list.txt" ]; then
-    echo "输出 $FILE_PATH/list.txt 的内容:"
+    echo -e "${green}singbox节点信息:"
     cat "$FILE_PATH/list.txt"
   else
     echo "$FILE_PATH/list.txt 文件不存在"
@@ -462,7 +461,7 @@ get_links() {
 
   # 输出 $WORKDIR/list.txt 的内容
   if [ -e "$WORKDIR/list.txt" ]; then
-    echo "输出 $WORKDIR/list.txt 的内容:"
+    echo -e "${green}socks5节点信息:"
     cat "$WORKDIR/list.txt"
   else
     echo "$WORKDIR/list.txt 文件不存在"
@@ -554,18 +553,17 @@ install_socks5(){
 
       # 检查 socks5 程序是否成功启动
       if pgrep -x "s5" > /dev/null; then
+        Socks5="socks://$(echo "$SOCKS5_USER:$SOCKS5_PASS"|base64 -w0)@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP"
         echo -e "\e[1;32mSocks5 代理程序启动成功\e[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$HOST_IP:$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS\033[0m"
-        echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32msocks://$(echo "$SOCKS5_USER:$SOCKS5_PASS"|base64 -w0)@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP\033[0m"
+        echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$Socks5\033[0m"
         
         # 更新或创建 list.txt 文件
         cat >> "$FILE_PATH/list.txt" <<EOF
-
-socks5节点信息
-
 服务器IP：$HOST_IP 端口：$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS
 
-socks5://$SOCKS5_USER:$SOCKS5_PASS@$HOST_IP:$SOCKS5_PORT
+$Socks5
+
 EOF
         add_crontab_task
       else

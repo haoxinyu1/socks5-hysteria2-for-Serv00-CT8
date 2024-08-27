@@ -63,6 +63,7 @@ restart_frps() {
     if is_frps_running; then
         echo "frps 进程已在运行，无需重新启动"
     else
+        echo "frps 进程未运行"
         start_process "$FRP_PATH" "$FRPS_EXEC" is_frps_running "frps"
     fi
 }
@@ -87,6 +88,7 @@ if [ -d "$S5_PATH" ]; then
     if is_s5_running; then
         echo "s5 进程正在运行"
     else
+        echo "s5 进程未运行"
         start_process "$S5_PATH" "$S5_EXEC" is_s5_running "s5"
     fi
 else
@@ -98,6 +100,7 @@ if [ -d "$WEB_PATH" ]; then
     if is_web_running; then
         echo "web 进程正在运行"
     else
+        echo "web 进程未运行"
         start_process "$WEB_PATH" "$WEB_EXEC" is_web_running "web"
     fi
 else

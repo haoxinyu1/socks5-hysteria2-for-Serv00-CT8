@@ -97,7 +97,7 @@ generate_uuid() {
 
 install_singbox() {
     echo -e "${yellow}本脚本同时四协议共存${purple}(vmess-ws,vmess-ws-tls(argo),hysteria2,socks5)${re}"
-    echo -e "${yellow}开始运行前，请确保在面板${purple}已开放3个端口，一个udp端口和两个tcp端口${re}"
+    echo -e "${yellow}开始运行前，请确保在面板${purple}已开放3个端口，一个tcp端口和两个udp端口${re}"
     echo -e "${yellow}面板${purple}Additional services中的Run your own applications${yellow}已开启为${purple}Enabled${yellow}状态${re}"
 
     # 读取用户选择

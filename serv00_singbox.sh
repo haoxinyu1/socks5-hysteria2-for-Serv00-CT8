@@ -14,6 +14,7 @@ reading() { read -p "$(red "$1")" "$2"; }
 USERNAME=$(whoami)
 # 获取当前主机名
 HOSTNAME=$(hostname)
+NAME=$(echo "$HOSTNAME" | cut -d'.' -f1)
 # 获取标准化的用户主目录
 USER_HOME=$(readlink -f /home/$USERNAME)
 # 停止程序线程
@@ -434,13 +435,13 @@ get_ip() {
 
 set_links(){
   IP=$(get_ip)
-  ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26"-"$18}' | sed -e 's/ /_/g') 
+  ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26}' | sed -e 's/ /_/g')
   sleep 1
   yellow "注意：v2ray或其他软件的跳过证书验证需设置为true,否则hy2或tuic节点可能不通\n"
   cat >> list.txt <<EOF
-vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$USERNAME-$ISP
+vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$USERNAME-$ISP-$NAME
 
-hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME-$ISP
+hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$USERNAME-$ISP-$NAME
 
 EOF
   cat list.txt
@@ -533,7 +534,7 @@ install_socks5() {
     [Yy])
       # 进行 socks5 配置
       socks5_config
-      ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26"-"$18}' | sed -e 's/ /_/g') 
+      ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26}' | sed -e 's/ /_/g')
       
       # 下载或更新 socks5 程序
       if [[ ! -e "${FILE_PATH}/s5" ]]; then
@@ -558,7 +559,7 @@ install_socks5() {
 
       # 检查 socks5 程序是否成功启动
       if pgrep -x "s5" > /dev/null; then
-        Socks5="socks://$(echo -n "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP"
+        Socks5="socks://$(echo -n "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$USERNAME-$ISP-$NAME"
         echo -e "\e[1;32mSocks5 代理程序启动成功\e[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$HOST_IP:$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS\033[0m"
         echo -e "\e[1;33mSocks5 代理地址：\033[0m \e[1;32m$Socks5\033[0m"

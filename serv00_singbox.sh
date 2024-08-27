@@ -451,20 +451,23 @@ EOF
 }
 
 get_links() {
+  green="\033[32m"
+  reset="\033[0m"
+
   # 输出 $FILE_PATH/list.txt 的内容
   if [ -e "$FILE_PATH/list.txt" ]; then
-    echo -e "${green}singbox节点信息:"
+    echo -e "${green}singbox节点信息:${reset}"
     cat "$FILE_PATH/list.txt"
   else
-    echo "$FILE_PATH/list.txt 文件不存在"
+    echo -e "${green}$FILE_PATH/list.txt 文件不存在${reset}"
   fi
 
   # 输出 $WORKDIR/list.txt 的内容
   if [ -e "$WORKDIR/list.txt" ]; then
-    echo -e "${green}socks5节点信息:"
+    echo -e "${green}socks5节点信息:${reset}"
     cat "$WORKDIR/list.txt"
   else
-    echo "$WORKDIR/list.txt 文件不存在"
+    echo -e "${green}$WORKDIR/list.txt 文件不存在${reset}"
   fi
 }
 

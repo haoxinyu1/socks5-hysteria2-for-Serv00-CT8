@@ -14,8 +14,15 @@ reading() { read -p "$(red "$1")" "$2"; }
 USERNAME=$(whoami)
 # 获取用户名的长度
 len=${#USERNAME}
+# 如果用户名长度小于或等于5，则不处理直接输出
+if [ "$len" -le 5 ]; then
+    MASKED_USERNAME="$USERNAME"
+else
+    # 保留第一个字符和最后四个字符，中间用三个*号代替
+    MASKED_USERNAME="${USERNAME:0:1}***${USERNAME: -4}"
+fi
 # 保留第一个字符和最后一个字符，其他部分用*号替换
-MASKED_USERNAME="${USERNAME:0:1}$(printf '*%.0s' $(seq 2 $((len-1))))${USERNAME: -1}"
+# MASKED_USERNAME="${USERNAME:0:1}$(printf '*%.0s' $(seq 2 $((len-1))))${USERNAME: -1}"
 # 获取当前主机名
 HOSTNAME=$(hostname)
 NAME=$(echo "$HOSTNAME" | cut -d'.' -f1)

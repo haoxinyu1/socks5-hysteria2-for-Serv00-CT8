@@ -7,11 +7,13 @@ HOSTNAME=$(hostname)
 
 # 应用程序路径设置，根据主机名来选择不同的路径
 if [[ $HOSTNAME == *"ct8.pl"* ]]; then
+    USER_PATH="/home/$USER/domains/$USER.ct8.pl"
     APP_PATH="/home/$USER/domains/$USER.ct8.pl/vless/app.js"
     FRP_PATH="/home/$USER/domains/${USER}.ct8.pl/frp"
     WEB_PATH="/home/$USER/domains/${USER}.ct8.pl/singbox"
     S5_PATH="/home/$USER/domains/${USER}.ct8.pl/socks5"
 elif [[ $HOSTNAME == *"serv00.com"* ]]; then
+    USER_PATH="/home/$USER/domains/$USER.serv00.net"
     APP_PATH="/home/$USER/domains/$USER.serv00.net/vless/app.js"
     FRP_PATH="/home/$USER/domains/${USER}.serv00.net/frp"
     WEB_PATH="/home/$USER/domains/${USER}.serv00.net/singbox"
@@ -103,11 +105,39 @@ manage_web() {
     fi
 }
 
+# 添加 crontab 守护进程任务
+add_crontab_task() {
+  # 备份现有的 crontab 任务到临时文件
+  crontab -l > /tmp/crontab.bak 2>/dev/null
+  
+  # 定义要添加的任务
+  new_task="*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1"
+
+  # 检查是否存在相同的任务
+  if grep -Fxq "$new_task" /tmp/crontab.bak; then
+    echo "相同的 crontab 任务已经存在，跳过添加"
+  else
+    # 如果存在类似的任务，先删除它，然后添加新任务
+    grep -v "start_app.sh" /tmp/crontab.bak > /tmp/crontab.new
+    echo "$new_task" >> /tmp/crontab.new
+    
+    # 重新加载 crontab 任务
+    crontab /tmp/crontab.new
+    rm /tmp/crontab.new
+
+    echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
+  fi
+  
+  # 删除临时 crontab 文件
+  rm /tmp/crontab.bak
+}
+
 # 主逻辑执行
 manage_vless
 manage_frps
 manage_s5
 manage_web
+add_crontab_task
 
 # 可选：调用 force_restart_frps 强制重启 frps
 # force_restart_frps

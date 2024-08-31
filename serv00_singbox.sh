@@ -146,7 +146,7 @@ install_singbox() {
             generate_config   # 生成配置文件
             download_singbox  # 下载 SingBox 并启动
             set_links         # 写入相关链接和信息
-	    # install_socks5    # 安装socks5
+	    add_crontab_task    # 添加定时任务
             ;;
         [Nn]) 
             exit 0 
@@ -491,6 +491,7 @@ get_ip() {
 
 set_links(){
   IP=$(get_ip)
+  Socks5="socks://$(echo -n "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$MASKED_USERNAME-$ISP-$NAME-S5"
   ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26}' | sed -e 's/ /_/g')
   sleep 1
   yellow "注意：v2ray或其他软件的跳过证书验证需设置为true,否则hy2或tuic节点可能不通\n"
@@ -498,6 +499,10 @@ set_links(){
 vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.ups.com&fp=chrome&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&type=tcp&headerType=none#$MASKED_USERNAME-$ISP-$NAME-VL
 
 hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$MASKED_USERNAME-$ISP-$NAME-HY2
+
+服务器IP：$HOST_IP 端口：$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS
+
+$Socks5
 
 EOF
   cat list.txt
@@ -693,6 +698,16 @@ run_socks5() {
 
 # 添加 crontab 守护进程任务
 add_crontab_task() {
+  # 提示用户是否要添加定时任务
+  read -p "是否要添加定时任务？[y/n]: " choice
+
+  # 转换为小写以处理 Y 和 N 的情况
+  choice=$(echo "$choice" | tr '[:upper:]' '[:lower:]')
+
+  if [ "$choice" != "y" ]; then
+    echo "已取消添加定时任务"
+    exit 0
+  fi
   # 进入 USER_PATH 目录
   cd "$USER_PATH" || { echo "无法进入目录 $USER_PATH"; exit 1; }
   

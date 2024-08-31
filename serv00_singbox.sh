@@ -491,8 +491,8 @@ get_ip() {
 
 set_links(){
   IP=$(get_ip)
-  Socks5="socks://$(echo -n "$SOCKS5_USER:$SOCKS5_PASS" | base64 -w0)@$HOST_IP:$SOCKS5_PORT#$MASKED_USERNAME-$ISP-$NAME-S5"
   ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26}' | sed -e 's/ /_/g')
+  Socks5="socks://$(echo -n "$socks_user:$socks_pass" | base64 -w0)@$IP:$socks_port#$MASKED_USERNAME-$ISP-$NAME-S5"
   sleep 1
   yellow "注意：v2ray或其他软件的跳过证书验证需设置为true,否则hy2或tuic节点可能不通\n"
   cat >> list.txt <<EOF
@@ -500,7 +500,7 @@ vless://$UUID@$IP:$vmess_port?encryption=none&flow=xtls-rprx-vision&security=rea
 
 hysteria2://$UUID@$IP:$hy2_port/?sni=www.bing.com&alpn=h3&insecure=1#$MASKED_USERNAME-$ISP-$NAME-HY2
 
-服务器IP：$HOST_IP 端口：$SOCKS5_PORT 用户名：$SOCKS5_USER 密码：$SOCKS5_PASS
+服务器IP：$IP 端口：$socks_port 用户名：$socks_user 密码：$socks_pass
 
 $Socks5
 

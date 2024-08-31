@@ -69,6 +69,38 @@ read_hy2_port() {
     done
 }
 
+read_socks_variables() {
+    while true; do
+        reading "请输入socks端口 (面板开放的TCP端口): " socks_port
+        if [[ ! -z "$socks_port" ]]; then
+            green "你的socks端口为: $socks_port"
+            break
+        else
+            yellow "输入错误，请重新输入面板开放的TCP端口"
+        fi
+    done
+
+    while true; do
+        reading "请输入socks用户名: " socks_user
+        if [[ ! -z "$socks_user" ]]; then
+            green "你的socks用户名为: $socks_user"
+            break
+        else
+            yellow "用户名不能为空，请重新输入"
+        fi
+    done
+
+    while true; do
+        reading "请输入socks密码，不能包含:和@符号: " socks_pass
+        if [[ ! -z "$socks_pass" ]]; then
+            green "你的socks密码为: $socks_pass"
+            break
+        else
+            yellow "密码不能为空，请重新输入"
+        fi
+    done
+}
+
 
 # UUID 生成函数
 generate_uuid() {
@@ -110,10 +142,11 @@ install_singbox() {
             cd "$WORKDIR" || { red "无法切换到工作目录 $WORKDIR，退出安装。"; exit 1; }  # 确保目录切换成功
             read_vmess_port   # 读取 VMess 端口
             read_hy2_port     # 读取 Hysteria2 端口
+	    read_socks_variables # 读取 socks5 端口
             generate_config   # 生成配置文件
             download_singbox  # 下载 SingBox 并启动
             set_links         # 写入相关链接和信息
-	    install_socks5    # 安装socks5
+	    # install_socks5    # 安装socks5
             ;;
         [Nn]) 
             exit 0 
@@ -249,7 +282,19 @@ generate_config() {
                ]
            }
        }
-   }
+   },
+    {
+      "tag": "socks-in",
+      "type": "socks",
+      "listen": "::",
+      "listen_port": $socks_port,
+      "users": [
+        {
+          "username": "$socks_user",
+          "password": "$socks_pass"
+        }
+      ]
+    }
 
  ],
     "outbounds": [
@@ -699,17 +744,11 @@ menu() {
    echo  "==============="
    yellow "3. 运行sing-box"
    echo  "==============="
-   green "4. 安装socks5"
+   green "4. 查看节点信息"
    echo  "==============="
-   red "5. 卸载socks5"
+   yellow "5. 清理所有进程"
    echo  "==============="
-   yellow "6. 运行socks5"
-   echo  "==============="
-   green "7. 查看节点信息"
-   echo  "==============="
-   yellow "8. 清理所有进程"
-   echo  "==============="
-   green "9. 添加定时任务脚本"
+   green "6. 添加定时任务脚本"
    echo  "==============="
    red "0. 退出脚本"
    echo "==========="
@@ -719,12 +758,9 @@ menu() {
         1) install_singbox ;;
         2) uninstall_singbox ;; 
         3) run_sing_box ;; 
-	4) install_socks5 ;;
-	5) uninstall_socks5 ;;
-	6) run_socks5 ;;
-	7) get_links ;;
-	8) kill_tasks ;;
-        9) add_crontab_task ;;
+	4) get_links ;;
+	5) kill_tasks ;;
+        6) add_crontab_task ;;
         0) exit 0 ;;
         *) red "无效的选项，请输入 0 到 9" ;;
     esac

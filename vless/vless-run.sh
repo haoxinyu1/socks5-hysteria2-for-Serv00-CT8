@@ -1,5 +1,49 @@
 #!/bin/bash
 
+# 定义添加 crontab 守护进程任务的函数
+add_crontab_task() {
+    # 进入用户目录
+    cd "$USER_PATH"
+
+    # 下载并设置脚本
+    curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/serv00_singbox.sh -o serv00_singbox.sh && chmod +x serv00_singbox.sh
+    curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/start_app.sh -o start_app.sh && chmod +x start_app.sh
+    
+    # 检查是否成功下载
+    if [ ! -f "start_app.sh" ]; then
+        echo "下载 start_app.sh 失败，退出"
+        exit 1
+    fi
+
+    # 备份现有的 crontab 任务到临时文件
+    crontab -l > /tmp/crontab.bak 2>/dev/null
+    
+    # 定义要添加的任务
+    new_task="*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1"
+
+    # 检查是否已经存在任务
+    if grep -Fxq "$new_task" /tmp/crontab.bak; then
+        echo "相同的 crontab 任务已经存在，跳过添加"
+    else
+        # 删除旧任务，添加新任务
+        grep -v "start_app.sh" /tmp/crontab.bak > /tmp/crontab.new
+        echo "$new_task" >> /tmp/crontab.new
+        
+        # 更新 crontab 任务
+        crontab /tmp/crontab.new
+        rm /tmp/crontab.new
+
+        echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
+    fi
+    
+    # 删除临时文件
+    rm /tmp/crontab.bak
+    
+    # 等待2秒后执行 start_app.sh 脚本
+    sleep 2
+    ./start_app.sh
+}
+
 # 获取当前用户名
 USERNAME=$(whoami)
 # 获取当前主机名
@@ -75,61 +119,17 @@ wss.on('connection', ws => {
 });
 EOL
 
-    # 运行添加 crontab 任务的函数
+    # 调用 add_crontab_task 函数
     add_crontab_task
 
     # 获取 ISP 信息
     ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26}' | sed -e 's/ /_/g')
     echo "app.js 已生成，使用的端口为: $vless_port，UUID 为: $vless_uuid"
     echo
-    echo "节点连接为：vless://$vless_uuid@$USERNAME.serv00.net:$vless_port?encryption=none&security=none&type=ws&path=USERNAME-$ISP-$NAME-VL"
+    echo "节点连接为：vless://$vless_uuid@$USERNAME.serv00.net:$vless_port?encryption=none&security=none&type=ws&path=$USERNAME-$ISP-$NAME-VL"
     echo
 else
     echo
     echo "自动安装失败，请手动解压操作，并配置文件"
     echo
 fi
-
-# 添加 crontab 守护进程任务
-add_crontab_task() {
-    # 进入用户目录
-    cd "$USER_PATH"
-
-    # 下载并设置脚本
-    curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/serv00_singbox.sh -o serv00_singbox.sh && chmod +x serv00_singbox.sh
-    curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/start_app.sh -o start_app.sh && chmod +x start_app.sh
-    
-    # 检查是否成功下载
-    if [ ! -f "start_app.sh" ]; then
-        echo "下载 start_app.sh 失败，退出"
-        exit 1
-    fi
-
-    # 备份现有的 crontab 任务到临时文件
-    crontab -l > /tmp/crontab.bak 2>/dev/null
-    
-    # 定义要添加的任务
-    new_task="*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1"
-
-    # 检查是否已经存在任务
-    if grep -Fxq "$new_task" /tmp/crontab.bak; then
-        echo "相同的 crontab 任务已经存在，跳过添加"
-    else
-        # 删除旧任务，添加新任务
-        grep -v "start_app.sh" /tmp/crontab.bak > /tmp/crontab.new
-        echo "$new_task" >> /tmp/crontab.new
-        
-        # 更新 crontab 任务
-        crontab /tmp/crontab.new
-        rm /tmp/crontab.new
-
-        echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
-    fi
-    
-    # 删除临时文件
-    rm /tmp/crontab.bak
-    
-    # 等待2秒后执行 start_app.sh 脚本
-    sleep 2
-    ./start_app.sh
-}

@@ -126,8 +126,8 @@ EOL
     ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26}' | sed -e 's/ /_/g')
     echo "app.js 已生成，使用的端口为: $vless_port，UUID 为: $vless_uuid"
     echo
-    echo "节点连接为：vless://$vless_uuid@$USERNAME.serv00.net:$vless_port?encryption=none&security=none&type=ws&path=$USERNAME-$ISP-$NAME-VL"
-    echo
+    echo "节点连接为：vless://$vless_uuid@$USERNAME.serv00.net:$vless_port?encryption=none&security=none&type=ws&path=/#$USERNAME-$ISP-$NAME-VL"
+    echo "加速节点连接为：vless://$vless_uuid@usa.visa.com:443?encryption=none&security=tls&sni=你的cf加速域名&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&allowInsecure=1&type=ws&host=你的cf加速域名&path=/#$USERNAME-$ISP-$NAME-VL"
 else
     echo
     echo "自动安装失败，请手动解压操作，并配置文件"

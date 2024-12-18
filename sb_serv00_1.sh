@@ -377,48 +377,33 @@ get_argodomain() {
 }
 
 get_ip() {
-    local ip=""
     local ip_services=(
         "https://ipv4.ip.sb"
         "https://api.ipify.org"
         "https://ipinfo.io/ip"
         "https://ifconfig.me"
         "https://v4.ident.me"
+        "https://icanhazip.com"
+        "https://ident.me"
+        "https://myip.dnsomatic.com"
     )
 
-    # 尝试多个IP获取服务
-    for service in "${ip_services[@]}"; do
-        ip=$(curl -s --max-time 10 "$service")
-        if [[ -n "$ip" && "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            break
-        fi
-    done
-
-    # 如果未获取到IP
-    if [ -z "$ip" ]; then
-        # Serv00主机名处理
-        if [[ "$HOSTNAME" =~ ^s([0-9]|[1-2][0-9]|30)\.serv00\.com$ ]]; then
-            ip="cache${BASH_REMATCH[1]}.serv00.com"
-        else
-            ip="$HOSTNAME"
-        fi
-    fi
-
-    # 验证IP可用性
-    if [ -n "$ip" ]; then
-        local url="https://www.toolsdaquan.com/toolapi/public/ipchecking/$ip/443"
-        local response=$(curl -s --location --max-time 3 --request GET "$url" --header 'Referer: https://www.toolsdaquan.com/ipcheck')
-        
-        if [ -z "$response" ] || ! echo "$response" | grep -q '"icmp":"success"'; then
-            # 如果验证失败，再次尝试备选方案
-            if [[ "$HOSTNAME" =~ ^s([0-9]|[1-2][0-9]|30)\.serv00\.com$ ]]; then
-                ip="cache${BASH_REMATCH[1]}.serv00.com"
+    while true; do
+        for service in "${ip_services[@]}"; do
+            ip=$(curl -s --max-time 2 "$service")
+            
+            # 严格验证IP格式
+            if [[ -n "$ip" && "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "$ip"
+                return 0
             fi
-        fi
-    fi
-
-    echo "$ip"
+        done
+        
+        # 如果所有服务都失败，等待2秒后重试
+        sleep 2
+    done
 }
+
 if [[ "$(get_ip)" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     IP=$(get_ip)
 else

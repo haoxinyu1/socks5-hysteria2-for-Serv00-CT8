@@ -388,7 +388,7 @@ get_ip() {
 
     # 尝试多个IP获取服务
     for service in "${ip_services[@]}"; do
-        ip=$(curl -s --max-time 2 "$service")
+        ip=$(curl -s --max-time 10 "$service")
         if [[ -n "$ip" && "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             break
         fi

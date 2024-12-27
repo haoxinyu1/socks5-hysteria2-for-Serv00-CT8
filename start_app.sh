@@ -12,12 +12,14 @@ if [[ $HOSTNAME == *"ct8.pl"* ]]; then
     FRP_PATH="/home/$USER/domains/${USER}.ct8.pl/frp"
     WEB_PATH="/home/$USER/domains/${USER}.ct8.pl/singbox"
     S5_PATH="/home/$USER/domains/${USER}.ct8.pl/socks5"
+    SINGBOX_PATH="/home/$USER/domains/${USER}.ct8.pl/logs"
 elif [[ $HOSTNAME == *"serv00.com"* ]]; then
     USER_PATH="/home/$USER/domains/$USER.serv00.net"
     APP_PATH="/home/$USER/domains/$USER.serv00.net/vless/app.js"
     FRP_PATH="/home/$USER/domains/${USER}.serv00.net/frp"
     WEB_PATH="/home/$USER/domains/${USER}.serv00.net/singbox"
     S5_PATH="/home/$USER/domains/${USER}.serv00.net/socks5"
+    SINGBOX_PATH="/home/$USER/domains/${USER}.serv00.net/logs"
 else
     echo "未知的主机名: $HOSTNAME"
     exit 1

@@ -1,83 +1,107 @@
 #!/bin/bash
+red="\033[1;91m"
+green="\e[1;32m"
+yellow="\e[1;33m"
+purple="\e[1;35m"
+red() { echo -e "\e[1;91m$1\033[0m"; }
+green() { echo -e "\e[1;32m$1\033[0m"; }
+yellow() { echo -e "\e[1;33m$1\033[0m"; }
+purple() { echo -e "\e[1;35m$1\033[0m"; }
+reading() { read -p "$(red "$1")" "$2"; }
 
-# 定义添加 crontab 守护进程任务的函数
-add_crontab_task() {
-    # 进入用户目录
-    cd "$USER_PATH"
+# 获取用户信息
+USERNAME=$(whoami | tr '[:upper:]' '[:lower:]')
+snb=$(hostname | cut -d. -f1)
+HOSTNAME=$(hostname)
+hona=$(hostname | cut -d. -f2)
 
-    # 下载并设置脚本
-    curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/serv00_singbox.sh -o serv00_singbox.sh && chmod +x serv00_singbox.sh
-    curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/start_app.sh -o start_app.sh && chmod +x start_app.sh
-    
-    # 检查是否成功下载
-    if [ ! -f "start_app.sh" ]; then
-        echo "下载 start_app.sh 失败，退出"
-        exit 1
-    fi
+# 设置路径
+if [ "$hona" = "serv00" ]; then
+  address="serv00.net"
+  keep_path="${HOME}/domains/${snb}.${USERNAME}.serv00.net/public_nodejs"
+  [ -d "$keep_path" ] || mkdir -p "$keep_path"
+else
+  address="useruno.com"
+  keep_path="${HOME}/domains/${snb}.${USERNAME}.${address}/public_nodejs"
+  [ -d "$keep_path" ] || mkdir -p "$keep_path"
+fi
 
-    # 备份现有的 crontab 任务到临时文件
-    crontab -l > /tmp/crontab.bak 2>/dev/null
-    
-    # 定义要添加的任务
-    new_task="*/12 * * * * nohup $USER_PATH/start_app.sh >/dev/null 2>&1"
-
-    # 检查是否已经存在任务
-    if grep -Fxq "$new_task" /tmp/crontab.bak; then
-        echo "相同的 crontab 任务已经存在，跳过添加"
-    else
-        # 删除旧任务，添加新任务
-        grep -v "start_app.sh" /tmp/crontab.bak > /tmp/crontab.new
-        echo "$new_task" >> /tmp/crontab.new
-        
-        # 更新 crontab 任务
-        crontab /tmp/crontab.new
-        rm /tmp/crontab.new
-
-        echo -e "\e[1;32mCrontab 任务添加完成\e[0m"
-    fi
-    
-    # 删除临时文件
-    rm /tmp/crontab.bak
-    
-    # 等待2秒后执行 start_app.sh 脚本
-    sleep 2
-    ./start_app.sh
+# 创建Node.js网站函数
+create_nodejs_site() {
+  green "开始安装Node.js网站，请稍等……"
+  
+  # 删除和添加网站
+  devil www del ${snb}.${USERNAME}.${hona}.net > /dev/null 2>&1
+  devil www add ${snb}.${USERNAME}.${hona}.net nodejs /usr/local/bin/node18 > /dev/null 2>&1
+  
+  # 设置Node.js环境
+  ln -fs /usr/local/bin/node18 ~/bin/node > /dev/null 2>&1
+  ln -fs /usr/local/bin/npm18 ~/bin/npm > /dev/null 2>&1
+  mkdir -p ~/.npm-global
+  npm config set prefix '~/.npm-global'
+  echo 'export PATH=~/.npm-global/bin:~/bin:$PATH' >> $HOME/.bash_profile && source $HOME/.bash_profile
+  rm -rf $HOME/.npmrc > /dev/null 2>&1
+  
+  # 安装依赖
+  cd "$keep_path"
+  npm install basic-auth express dotenv axios --silent > /dev/null 2>&1
+  
+  # 清理默认索引文件
+  rm $HOME/domains/${snb}.${USERNAME}.${hona}.net/public_nodejs/public/index.html > /dev/null 2>&1
+  
+  # 下载应用程序文件
+  reading "是否要下载示例应用程序文件？[y/n]: " download_app
+  if [[ "$download_app" == "y" || "$download_app" == "Y" ]]; then
+    yellow "下载示例应用程序文件..."
+    curl -sL https://raw.githubusercontent.com/haoxinyu1/sing-box-yg/main/app.js -o "$keep_path"/app.js
+    green "应用程序文件已下载并配置"
+  fi
+  
+  # 重启网站
+  devil www restart ${snb}.${USERNAME}.${hona}.net
+  curl -sk "http://${snb}.${USERNAME}.${hona}.net/up" > /dev/null 2>&1
+  
+  green "安装完毕，Node.js网站地址：http://${snb}.${USERNAME}.${hona}.net"
+  yellow "Node.js应用目录：$keep_path"
 }
 
-# 获取当前用户名
-USERNAME=$(whoami)
-# 获取当前主机名
-HOSTNAME=$(hostname)
-NAME=$(echo "$HOSTNAME" | cut -d'.' -f1)
-# 设置用户目录路径
-USER_PATH=$(pwd)
-
-cd domains/$USERNAME.serv00.net/
-
-# 下载 vless.zip
-wget https://raw.githubusercontent.com/bin862324915/serv00-app/main/vless/vless.zip -O vless.zip
-
-# 解压文件
-unzip vless.zip
-
-# 检查是否成功解压
-if [ -f "vless/app.js" ]; then
+# 安装VLESS应用
+install_vless() {
+  green "开始安装VLESS应用，请稍等……"
+  
+  # 设置用户目录路径
+  USER_PATH=$(pwd)
+  
+  # 进入用户域名目录
+  cd domains/${USERNAME}.${address}/
+  
+  # 下载vless.zip
+  wget https://raw.githubusercontent.com/bin862324915/serv00-app/main/vless/vless.zip -O vless.zip
+  
+  # 解压文件
+  unzip -o vless.zip
+  
+  # 检查是否成功解压
+  if [ -f "vless/app.js" ]; then
     clear
     echo
-    echo "vless 应用以及相关的依赖已经自动安装完成"
+    green "VLESS应用以及相关的依赖已经自动安装完成"
     echo
-
-    # 设置 VLESS 节点端口
-    read -p "请设置 vless 节点端口（例如 8080）： " vless_port
-    echo "节点端口已设置为: $vless_port"
+    
+    # 设置VLESS节点端口
+    reading "请设置VLESS节点端口（例如8080）: " vless_port
+    green "节点端口已设置为: $vless_port"
     echo
-
-    # 设置 UUID
-    read -p "请设置 UUID： " vless_uuid
-    echo "UUID 已设置为: $vless_uuid"
+    
+    # 设置UUID
+    reading "请设置UUID（留空自动生成）: " vless_uuid
+    if [[ -z "$vless_uuid" ]]; then
+      vless_uuid=$(uuidgen -r)
+    fi
+    green "UUID已设置为: $vless_uuid"
     echo
-
-    # 生成 app.js 配置文件
+    
+    # 生成app.js配置文件
     cat > vless/app.js <<EOL
 const net = require('net');
 const WebSocket = require('ws');
@@ -118,18 +142,91 @@ wss.on('connection', ws => {
     }).on('error', errcb('EE:'));
 });
 EOL
-
-    # 调用 add_crontab_task 函数
+    
+    # 添加crontab守护进程任务
     add_crontab_task
-
-    # 获取 ISP 信息
+    
+    # 获取ISP信息
     ISP=$(curl -s https://speed.cloudflare.com/meta | awk -F\" '{print $26}' | sed -e 's/ /_/g')
-    echo "app.js 已生成，使用的端口为: $vless_port，UUID 为: $vless_uuid"
+    
+    # 显示节点连接信息
     echo
-    echo "节点连接为：vless://$vless_uuid@$USERNAME.serv00.net:$vless_port?encryption=none&security=none&type=ws&path=/#$USERNAME-$ISP-$NAME-VL"
-    echo "加速节点连接为：vless://$vless_uuid@usa.visa.com:443?encryption=none&security=tls&sni=你的cf加速域名&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&allowInsecure=1&type=ws&host=你的cf加速域名&path=/#$USERNAME-$ISP-$NAME-VL"
-else
+    green "app.js已生成，使用的端口为: $vless_port，UUID为: $vless_uuid"
     echo
-    echo "自动安装失败，请手动解压操作，并配置文件"
-    echo
-fi
+    yellow "节点连接为：vless://$vless_uuid@$USERNAME.${address}:$vless_port?encryption=none&security=none&type=ws&path=/#$USERNAME-$ISP-$snb-VL"
+    yellow "加速节点连接为：vless://$vless_uuid@usa.visa.com:443?encryption=none&security=tls&sni=你的cf加速域名&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&allowInsecure=1&type=ws&host=你的cf加速域名&path=/#$USERNAME-$ISP-$snb-VL"
+  else
+    red "自动安装失败，请手动解压操作，并配置文件"
+  fi
+  
+  # 返回初始目录
+  cd $USER_PATH
+}
+
+# 定义添加crontab守护进程任务的函数
+add_crontab_task() {
+  # 当前目录应该是domains/${USERNAME}.${address}/
+  
+  # 下载并设置脚本
+  curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/serv00_singbox.sh -o serv00_singbox.sh && chmod +x serv00_singbox.sh
+  curl -Ls https://raw.githubusercontent.com/haoxinyu1/socks5-hysteria2-for-Serv00-CT8/main/start_app.sh -o start_app.sh && chmod +x start_app.sh
+  
+  # 检查是否成功下载
+  if [ ! -f "start_app.sh" ]; then
+    red "下载start_app.sh失败，退出"
+    return 1
+  fi
+  
+  # 备份现有的crontab任务到临时文件
+  crontab -l > /tmp/crontab.bak 2>/dev/null
+  
+  # 定义要添加的任务
+  new_task="*/12 * * * * nohup $(pwd)/start_app.sh >/dev/null 2>&1"
+  
+  # 检查是否已经存在任务
+  if grep -Fxq "$new_task" /tmp/crontab.bak; then
+    yellow "相同的crontab任务已经存在，跳过添加"
+  else
+    # 删除旧任务，添加新任务
+    grep -v "start_app.sh" /tmp/crontab.bak > /tmp/crontab.new
+    echo "$new_task" >> /tmp/crontab.new
+    
+    # 更新crontab任务
+    crontab /tmp/crontab.new
+    rm /tmp/crontab.new
+    
+    green "Crontab任务添加完成"
+  fi
+  
+  # 删除临时文件
+  rm /tmp/crontab.bak
+  
+  # 等待2秒后执行start_app.sh脚本
+  sleep 2
+  ./start_app.sh
+}
+
+# 菜单
+menu() {
+  clear
+  echo "============================================================"
+  green "Node.js & VLESS应用创建脚本"
+  echo "============================================================"
+  green "1. 创建Node.js网站"
+  green "2. 安装VLESS应用"
+  red   "0. 退出脚本"
+  echo "============================================================"
+  
+  reading "请输入选择【0-2】: " choice
+  echo
+  
+  case "${choice}" in
+    1) create_nodejs_site ;;
+    2) install_vless ;;
+    0) exit 0 ;;
+    *) red "无效的选项，请输入 0-2" && menu ;;
+  esac
+}
+
+# 运行菜单
+menu

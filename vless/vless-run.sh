@@ -101,6 +101,14 @@ install_vless() {
     green "UUID已设置为: $vless_uuid"
     echo
     
+    # 设置CF加速域名
+    reading "请输入你的CF加速域名（留空将显示占位符）: " cf_domain
+    if [[ -z "$cf_domain" ]]; then
+      cf_domain="你的cf加速域名"
+    fi
+    green "CF加速域名已设置为: $cf_domain"
+    echo
+    
     # 生成app.js配置文件
     cat > vless/app.js <<EOL
 const net = require('net');
@@ -154,7 +162,7 @@ EOL
     green "app.js已生成，使用的端口为: $vless_port，UUID为: $vless_uuid"
     echo
     yellow "节点连接为：vless://$vless_uuid@$USERNAME.${address}:$vless_port?encryption=none&security=none&type=ws&path=/#$USERNAME-$ISP-$snb-VL"
-    yellow "加速节点连接为：vless://$vless_uuid@usa.visa.com:443?encryption=none&security=tls&sni=你的cf加速域名&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&allowInsecure=1&type=ws&host=你的cf加速域名&path=/#$USERNAME-$ISP-$snb-VL"
+    yellow "加速节点连接为：vless://$vless_uuid@usa.visa.com:443?encryption=none&security=tls&sni=$cf_domain&pbk=SxBMcWxdxYBAh_IUSsiCDk6UHIf1NA1O8hUZ2hbRTFE&allowInsecure=1&type=ws&host=$cf_domain&path=/#$USERNAME-$ISP-$snb-VL"
   else
     red "自动安装失败，请手动解压操作，并配置文件"
   fi
